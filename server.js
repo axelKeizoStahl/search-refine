@@ -1,4 +1,5 @@
 const express = require("express");
+require('dotenv').config();
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const {Configuration, OpenAIApi} = require("openai");
@@ -14,18 +15,18 @@ app.post("/api/searchGoogle", async (req, res) => {
     var { query } = req.body;
     const userinput = query;
     const configuration = new Configuration({
-      apiKey: "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",
+      apiKey: process.env.OPENAI_API_TOKEN,
     });
     const openai = new OpenAIApi(configuration);
     const chatCompletion = await openai.createChatCompletion({
       model: "gpt-3.5-turbo",
-      messages: [{role: "user", content: `Refine a search query for better results, make sure to change it so that the results make more sense to the user, but keep it only a word or 2, return just the updated search query in quotes, no other text: "${userinput}"`}]
+      messages: [{role: "user", content: `Refine a search query for better results, make sure to change it so that the results make more sense to the user, but keep it to at most 3 words, return just the updated search query in quotes, no other text: "${userinput}"`}]
     });
     query =  chatCompletion.data.choices[0].message.content;
     const result = await axios.get("https://www.googleapis.com/customsearch/v1", {
       params: {
-        key: "AIzaSyB5ovc4GlyJNMbvzQGcXNme0JhGzAQWDW0",
-        cx: "522e3ec0502e94ffe",
+        key: process.env.GOOGLE_API_KEY,
+        cx: process.env.GOOGLE_CX,
         q: query
       }
     });

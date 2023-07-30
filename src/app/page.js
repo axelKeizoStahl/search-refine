@@ -1,5 +1,4 @@
 "use client"
-import styles from './page.module.css';
 import { useState } from 'react';
 
 export default function Home() {
@@ -28,7 +27,11 @@ export default function Home() {
 
       const searchResults = await response.json();
       console.log(searchResults);
-      setSearchResponses(searchResults.data);
+      if (searchResults.data) {
+        setSearchResponses(searchResults.data);
+      } else {
+        setSearchResponses("Sorry, due to a lack of resources the sites with the information are not available right now, you may try again");
+      }
       setSearchedText(searchResults.query);
       setQuery('');
     } catch (err) {
@@ -36,33 +39,39 @@ export default function Home() {
     }
   };
   return (
-    <div>
+    <div className='home'>
       <div className='header'>
         <h1>Search Refine</h1>
+        <h2>The first search engine <i>polished</i> by AI.</h2>
+        <p>Search Refine uses ai to refine your search so that you can get the results you want from a search engine. You can input a question, or even a vague description as the ai will translate it into something search engines can proccess better.</p>
+      </div>
+      <div className='search'>
         <form onSubmit={handleSearch}>
-          <label>
-            <input type='text' placeholder={query ? 'Type Here: ' : searchedText} value={query} onChange={handleChange} />
-          </label>
-          <input type='submit' value='Search' />
+          <input className='searchbar' type='text' placeholder={query ? 'Type Here: ' : searchedText} value={query} onChange={handleChange} />
+          <input className='submit' type='submit' />
         </form>
       </div>
       <div className="links">
-        {!searchResponses || searchResponses.length === 0 ? (
+        {searchResponses.length === 0 ? (
           <div></div>
-        ) : (
+        ) : typeof searchResponses === "object" ? (
           searchResponses.map((response, index) => (
-            <div className='responses' key={`response${index}`}>
-              <a href={response.link}>
-                <h4>{response.title}</h4>
-              </a>
-              <div className='snippet'>
-                {response.snippet}
+            <div className='text'>
+              <div className='responses' key={`response${index}`}>
+                <a href={response.link}>
+                  <h4>{response.title}</h4>
+                </a>
+                <div className='snippet'>
+                  {response.snippet}
+                </div>
+                <a href={response.link}>
+                  <small>{response.link}</small>
+                </a>
               </div>
-              <a href={response.link}>
-                <small>{response.link}</small>
-              </a>
             </div>
           ))
+        ) : (
+          <h4>{"Sorry, due to a lack of resources the sites with the information are not available right now, you may try again"}</h4> 
         )}
       </div>
     </div>
